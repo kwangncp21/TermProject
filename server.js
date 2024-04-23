@@ -1,10 +1,22 @@
 const express = require('express');
 const dotenv = require('dotenv');
+const connectDB = require('./config/db');
+const cookieParser = require('cookie-parser');
 
 //Load env vars
 dotenv.config({path:'./config/config.env'});
 
+connectDB();
+
 const app = express();
+
+app.use(express.json());
+
+app.use(cookieParser());
+
+const auth = require('./routes/auth');
+
+app.use(`/api/v1/auth`,auth);
 
 app.get('/',(req,res)=>{
     res.status(200).json({success:true,data:{id:1}});
