@@ -10,18 +10,21 @@ connectDB();
 
 const app = express();
 
+//Body parser
 app.use(express.json());
 
 app.use(cookieParser());
 
 const auth = require('./routes/auth');
+const workSpace = require('./routes/workSpace')
 
 app.use(`/api/v1/auth`,auth);
+app.use(`/api/v1/workspace`,workSpace);
 
-app.get('/',(req,res)=>{
-    res.status(200).json({success:true,data:{id:1}});
+// app.get('/',(req,res)=>{
+//     res.status(200).json({success:true,data:{id:1}});
 
-});
+// });
 
 const PORT=process.env.PORT || 3000;
 app.listen(PORT, console.log('server running in',process.env.NODE_ENV,'mode on port',PORT));
