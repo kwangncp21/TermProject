@@ -16,11 +16,23 @@ exports.getWorkspaces=async(req,res,next)=>{
    
 };
 
-exports.getWorkspace=(req,res,next)=>{
-    res.status(200).json({
-        success:true,
-        msg:`Show workspace ${req.params.id}`
-    });
+exports.getWorkspace=async(req,res,next)=>{
+    try{
+        const workspace = await workSpace.findById(req.params.id);
+        if(!workspace){
+            return res.status(400).json({
+                success:false,
+                msg:"Sorry,no available workspace!"
+            });
+        }
+        res.status(200).json({
+            success:true,
+            data:workspace
+        });
+    }catch(err){
+        res.status(400).json({success:false});
+    }
+    
 };
 
 exports.createWorkspace=async(req,res,next)=>{
@@ -28,20 +40,36 @@ exports.createWorkspace=async(req,res,next)=>{
     console.log(req.body);
     res.status(200).json({
         success:true,
-        msg:`Create new workspace`
+        data:workspace
     });
 };
 
-exports.updateWorkspace=(req,res,next)=>{
+exports.updateWorkspace=async(req,res,next)=>{
+    try{
+        const workspace = await workSpace.findByIdAndUpdate(req.params.id,req.body,{
+            new: true,
+            runValidators:true
+        });
+        if(!workspace){
+            return res.status(400).json({success:false});
+    }
     res.status(200).json({
         success:true,
-        msg:`Update workspace ${req.params.id}`
+        data:workspace
     });
+    }catch(err){
+        res.status(400).json({success:false});
+    }
 };
 
-exports.deleteWorkspace=(req,res,next)=>{
-    res.status(200).json({
-        success:true,
-        msg:`Delete workspace ${req.params.id}`
-    });
+exports.deleteWorkspace=async(req,res,next)=>{
+    try{
+        const workspace = await workSpace.findByIdAndDelete(req.params.id);
+        if(!workspace){
+            return res.status(400).json({success:false});
+        }
+        res.status(200).json({success:true,data:{}});
+    }catch(err){
+        res.status(400).json({success:false});
+    }
 };
