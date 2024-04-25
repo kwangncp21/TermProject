@@ -39,12 +39,12 @@ const WorkspaceSchema = new mongoose.Schema(
 );
 
 // //Reverse populate with virtuals
-WorkspaceSchema.virtual(`appointments`, {
-  ref: `Appointment`,
-  localField: `_id`,
-  foreignField: `workspace`,
-  justOne: false,
-});
+// WorkspaceSchema.virtual(`appointments`, {
+//   ref: `Appointment`,
+//   localField: `_id`,
+//   foreignField: `workspace`,
+//   justOne: false,
+// });
 
 // //Cascade delete appointments when a workspace is deleted
 // WorkspaceSchema.pre(`deleteOne`, { document: true, query: false }, async function(next) {
@@ -61,4 +61,4 @@ WorkspaceSchema.virtual(`appointments`, {
 //   next();
 // });
 
-module.exports = mongoose.model("Workspace", WorkspaceSchema);
+module.exports = mongoose.model("workSpace", WorkspaceSchema);

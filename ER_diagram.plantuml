@@ -1,0 +1,48 @@
+@startuml
+
+!define TABLE(x) entity x << (T,orchid) >>
+!define PRIMARY_KEY(x) <b><u>x</u></b>
+!define FOREIGN_KEY(x) <color:red>x</color>
+
+skinparam class {
+    BackgroundColor FloralWhite
+    BorderColor Black
+    ArrowColor Olive
+}
+
+'Tables
+TABLE("User") {
+    + PRIMARY_KEY(_id: ObjectId)
+    --
+    # name: String
+    # telephone: String
+    # email: String
+    # password: String
+    # role: String [user, admin]
+}
+
+TABLE("Workspace") {
+    + PRIMARY_KEY(_id: ObjectId)
+    --
+    # name: String
+    # address: String
+    # district: String
+    # province: String
+    # postalcode: String
+    # region: String
+}
+
+TABLE("Reservation") {
+    + PRIMARY_KEY(_id: ObjectId)
+    --
+    # appDate: Date
+    # FOREIGN_KEY(user: ObjectId ref User)
+    # FOREIGN_KEY(workspace: ObjectId ref Workspace)
+    # createAt: Date
+}
+
+'Relationships
+User --o{ Reservation
+Workspace --o{ Reservation
+
+@enduml
