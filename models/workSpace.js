@@ -4,35 +4,33 @@ const WorkspaceSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      reqiured: [true, "Please add a name"],
-      nuique: true,
+      required: [true, "Please add a name"],  // corrected from 'reqiured'
+      unique: true,  // corrected from 'nuique'
       trim: true,
-      maxlength: [50, "Name can not be nore than 50 characters"],
+      maxlength: [50, "Name can not be more than 50 characters"],
     },
     address: {
       type: String,
-      reqiured: [true, "Please add an address"],
+      required: [true, "Please add an address"],  // corrected from 'reqiured'
     },
     district: {
       type: String,
-      reqiured: [true, "Please add a district"],
+      required: [true, "Please add a district"],  // corrected from 'reqiured'
     },
     province: {
       type: String,
-      reqiured: [true, "Please add an province"],
+      required: [true, "Please add a province"],  // corrected from 'reqiured'
     },
     postalcode: {
       type: String,
-      reqiured: [true, "Please add a postalcode"],
+      required: [true, "Please add a postalcode"],  // corrected from 'reqiured'
       maxlength: [5, "Postalcode can not be more than 5 digits"],
-    },
-    tel: {
-      type: String,
     },
     region: {
       type: String,
-      reqiured: [true, "Please add a region"],
+      required: [true, "Please add a region"],  // corrected from 'reqiured'
     },
+   
   },
   {
     toJSON: { virtuals: true },
@@ -40,29 +38,27 @@ const WorkspaceSchema = new mongoose.Schema(
   }
 );
 
-//Reverse populate with virtuals
+// //Reverse populate with virtuals
 WorkspaceSchema.virtual(`appointments`, {
   ref: `Appointment`,
   localField: `_id`,
-  foreignField: `hospital`,
+  foreignField: `workspace`,
   justOne: false,
 });
-//Casade delete appointment
-WorkspaceSchema.pre(
-  `deleteOne`,
-  { document: true, query: false },
-  async function (next) {
-    console.log(`Appointments being removed from hospital ${this._id}`);
-    await this.model(`Appointment`).deleteMany({ hospital: this._id });
-    next();
-  }
-);
 
-//Cascade delete appointments when a hospital is delete
-WorkspaceSchema.pre(`deleteOne`,{document:true,query:false}, async function(next){
-  console.log(`Appointments being removed from hospital ${this._id}`);
-  await this.model(`Appointment`).deleteMany({hospital: this._id});
-  next();
-});
+// //Cascade delete appointments when a workspace is deleted
+// WorkspaceSchema.pre(`deleteOne`, { document: true, query: false }, async function(next) {
+//   console.log(`Appointments being removed from workspace ${this._id}`);
+//   await this.model(`Appointment`).deleteMany({ workSpace: this._id });
+//   next();
+// });
+
+
+// //Cascade delete appointments when a hospital is delete
+// WorkspaceSchema.pre(`deleteOne`,{document:true,query:false}, async function(next){
+//   console.log(`Appointments being removed from hospital ${this._id}`);
+//   await this.model(`Appointment`).deleteMany({workSpace: this._id});
+//   next();
+// });
 
 module.exports = mongoose.model("Workspace", WorkspaceSchema);

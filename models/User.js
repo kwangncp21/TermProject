@@ -27,6 +27,12 @@ const UserSchema = new mongoose.Schema({
         required:[true,'Please add a password'],
         minlength: 6,
         select: false
+    },
+    role: {
+        type:String,
+        // required:[true,'Please add a role'],
+        enum:['user','admin'],
+        default: 'user'
     }
     // },
     // createdAt:{

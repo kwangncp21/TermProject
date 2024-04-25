@@ -17,9 +17,11 @@ app.use(cookieParser());
 
 const auth = require('./routes/auth');
 const workSpace = require('./routes/workSpace')
+const reservations = require('./routes/reservation')
 
 app.use(`/api/v1/auth`,auth);
 app.use(`/api/v1/workspace`,workSpace);
+app.use(`/api/v1/reservation`,reservations);
 
 // app.get('/',(req,res)=>{
 //     res.status(200).json({success:true,data:{id:1}});

@@ -8,36 +8,30 @@ exports.protect = async(req, res, next) => {
         token = req.headers.authorization.split(' ')[1];
     }
     //Make sure token exists
-    if(!token || token=='null'){
+    if(!token){
         return res.status(401).json(
             {
                 success: false, 
-                message: 'Not authorized to access this route1'
+                message: 'Token is not exist,Not authorized to access this route'
             }
         );
     }
+    try{
+        //verify token
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-  //verify token
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        console.log(decoded);
 
-    console.log(decoded);
-
+        // Attach user to the request object
         req.user = await User.findById(decoded.id);
-        console.log(req.user)
+        if(!req.user){
+            return res.status(401).json({ success: false, message: "No user found with this token" });
+        }
+
         next();
-
-    }catch(err){
-        console.log(err.stack);
-        return res.status(401).json(
-            {
-                success: false, 
-                message: 'Not authorized to access this route2'
-            }
-        );
+    }catch (error) {
+        return res.status(401).json({ success: false, message: "Not authorized, token failed" });
     }
-
-
 };
 
 //Grant access to specific roles

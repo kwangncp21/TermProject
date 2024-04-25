@@ -1,8 +1,9 @@
-const workSpace = require("../models/workspace");
+const workSpace = require("../models/workSpace");
 
 exports.getWorkspaces=async(req,res,next)=>{
     try{
-        const workspaces = await workSpace.find();
+        const workspaces = await workSpace.find(req.query);
+        console.log(req.query);
         res.status(200).json({
             success:true,
             count:workspaces.length,
