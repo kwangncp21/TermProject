@@ -1,0 +1,27 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Registered User" as User
+actor "Administrator" as Admin
+
+rectangle "Co-working Space Reservation System" {
+
+  User --> (Register) : specifies name, \ntelephone number, \nemail, and password
+  User --> (Login) : uses email and password
+  User --> (Logout)
+  User --> (Reserve Co-working Space) : specifies date and \npreferred space
+  User --> (View Reservation)
+  User --> (Edit Reservation)
+  User --> (Delete Reservation)
+
+  Admin --> (View Any Reservation) : views all reservations
+  Admin --> (Edit Any Reservation) : edits any reservation
+  Admin --> (Delete Any Reservation) : deletes any reservation
+
+  (Reserve Co-working Space) .> (View Reservation) : extends
+  (Reserve Co-working Space) .> (Edit Reservation) : extends
+  (Reserve Co-working Space) .> (Delete Reservation) : extends
+}
+
+@enduml
