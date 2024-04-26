@@ -103,7 +103,7 @@ exports.addReservation = async (req, res, next) => {
         if (existingReservationsCount >= 3) {
             return res.status(400).json({
                 success: false,
-                message: "User has already reached the reservation limit of 3."
+                message: "User has already reached the reservation limit of 3 rooms"
             });
         }
 

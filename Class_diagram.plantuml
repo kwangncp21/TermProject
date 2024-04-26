@@ -1,0 +1,69 @@
+@startuml
+
+' Define classes with attributes and methods
+
+class User {
+    - name : String
+    - telephone : String
+    - email : String
+    - password : String
+    - role : String = "user"
+    + getSignedJwtToken() : String
+    + matchPassword(password : String) : Boolean
+}
+
+class Reservation {
+    - appDate : Date
+    - createAt : Date = Date.now()
+    + {static} create(reservationDetails : Object) : Reservation
+    + {static} findById(id : ObjectId) : Reservation
+    + delete() : void
+}
+
+class Workspace {
+    - name : String
+    - address : String
+    - district : String
+    - province : String
+    - postalcode : String
+    - region : String
+    - openClose : String
+    + {static} find(query : Object) : Array<Workspace>
+    + {static} findById(id : ObjectId) : Workspace
+    + delete() : void
+}
+
+' Define controllers
+class UserController {
+    + register(req : Request, res : Response) : void
+    + login(req : Request, res : Response) : void
+    + getMe(req : Request, res : Response) : void
+    + logout(req : Request, res : Response) : void
+    + deleteUser(req : Request, res : Response) : void
+    + getAllUsers(req : Request, res : Response) : void
+}
+
+class ReservationController {
+    + getReservations(req : Request, res : Response) : void
+    + getReservation(req : Request, res : Response) : void
+    + addReservation(req : Request, res : Response) : void
+    + updateReservation(req : Request, res : Response) : void
+    + deleteReservation(req : Request, res : Response) : void
+}
+
+class WorkspaceController {
+    + getWorkspaces(req : Request, res : Response) : void
+    + getWorkspace(req : Request, res : Response) : void
+    + createWorkspace(req : Request, res : Response) : void
+    + updateWorkspace(req : Request, res : Response) : void
+    + deleteWorkspace(req : Request, res : Response) : void
+}
+
+' Define relationships
+User "1" -- "0..*" Reservation : has >
+Reservation "1" -- "1" Workspace : uses >
+UserController ..> User : manages >
+ReservationController ..> Reservation : manages >
+WorkspaceController ..> Workspace : manages >
+
+@enduml
