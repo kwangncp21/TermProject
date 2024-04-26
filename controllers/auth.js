@@ -12,8 +12,6 @@ exports.register= async (req,res,next)=>{
             password,
             role
         });
-        // const token = user.getSignedJwtToken();
-        // res.status(200).json({success:true});
         sendTokenResponse(user,200,res);
 
     }catch(err){
@@ -70,13 +68,6 @@ exports.login = async(req,res,next)=>{
         return res.status(401).json({success:false,msg:'Invalid credentials'});
     }
 
-
-    // return res.status(401).json({success:false,msg:'Cannot convert email or password to string'});
-
-    //Create token
-    // const token = user.getSignedJwtToken();
-    // res.status(200).json({success:true,token});
-    // console.log(res.getHeaders());
     sendTokenResponse(user,200,res);
 };
 
@@ -101,5 +92,53 @@ exports.logout = async(req,res,next)=>{
     });
 }catch(err){
     res.status(500).json({ success: false, message: "Server error" });
+    }
+};
+
+exports.deleteUser = async (req, res, next) => {
+    try {
+        const user = await User.findById(req.params.id);
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
+        // Optionally, add additional authorization checks here to ensure the user has rights to delete the user
+
+        // Delete the user
+        await user.deleteOne();
+
+        res.status(200).json({
+            success: true,
+            data: {},
+            message: 'User successfully deleted'
+        });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to delete the user'
+        });
+    }
+};
+
+exports.getAllUsers = async (req, res, next) => {
+    try {
+        const users = await User.find({});  // Retrieve all users from the database
+
+        res.status(200).json({
+            success: true,
+            count: users.length,
+            data: users
+        });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to retrieve users'
+        });
     }
 };

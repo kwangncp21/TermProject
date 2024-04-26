@@ -30,35 +30,15 @@ const WorkspaceSchema = new mongoose.Schema(
       type: String,
       required: [true, "Please add a region"],  // corrected from 'reqiured'
     },
-   
+    "open-close":{
+      type: String,
+      required: [true, "Please add a operation hour"],  // corrected from 'reqiured'
+    }
   },
-  {
-    toJSON: { virtuals: true },
-    toObject: { virtuals: true }
-  }
+  // {
+  //   toJSON: { virtuals: true },
+  //   toObject: { virtuals: true }
+  // }
 );
-
-// //Reverse populate with virtuals
-// WorkspaceSchema.virtual(`appointments`, {
-//   ref: `Appointment`,
-//   localField: `_id`,
-//   foreignField: `workspace`,
-//   justOne: false,
-// });
-
-// //Cascade delete appointments when a workspace is deleted
-// WorkspaceSchema.pre(`deleteOne`, { document: true, query: false }, async function(next) {
-//   console.log(`Appointments being removed from workspace ${this._id}`);
-//   await this.model(`Appointment`).deleteMany({ workSpace: this._id });
-//   next();
-// });
-
-
-// //Cascade delete appointments when a hospital is delete
-// WorkspaceSchema.pre(`deleteOne`,{document:true,query:false}, async function(next){
-//   console.log(`Appointments being removed from hospital ${this._id}`);
-//   await this.model(`Appointment`).deleteMany({workSpace: this._id});
-//   next();
-// });
 
 module.exports = mongoose.model("workSpace", WorkspaceSchema);

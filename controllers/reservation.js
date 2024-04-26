@@ -10,7 +10,7 @@ exports.getReservations = async(req, res, next) => {
 
     // General users can see only their appointments!
     if (req.user.role !== 'admin') {
-        console.log("inside if check role")
+        // console.log("inside if check role")
         query = Reservation.find({ user: req.user.id }).populate({
             path: 'workspace',
             select: 'name address district province postalcode region' // adjust the fields as necessary
@@ -19,7 +19,7 @@ exports.getReservations = async(req, res, next) => {
     } else {
         // If Admin can see all
         if (req.params.workspaceId) {
-            console.log("check if workspaceID")
+            // console.log("check if workspaceID")
             console.log(req.params.workspaceId);
             query = Reservation.find({
                 workspace: req.params.workspaceId
@@ -52,6 +52,44 @@ exports.getReservations = async(req, res, next) => {
         return res.status(500).json({ success: false, message: "Cannot find your Reservation" });
     }
 };
+
+// In controllers/reservation.js
+
+exports.getReservation = async (req, res, next) => {
+    try {
+        const reservation = await Reservation.findById(req.params.id).populate({
+            path: 'workspace',
+            select: 'name address district province postalcode region' // Customize as needed
+        });
+
+        if (!reservation) {
+            return res.status(404).json({
+                success: false,
+                message: 'Reservation not found'
+            });
+        }
+
+        // Ensure user is either an admin or the owner of the reservation
+        if (req.user.role !== 'admin' && reservation.user.toString() !== req.user.id) {
+            return res.status(403).json({
+                success: false,
+                message: 'Unauthorized to access this reservation'
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            data: reservation
+        });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({
+            success: false,
+            message: 'Server error'
+        });
+    }
+};
+
 
 exports.addReservation = async (req, res, next) => {
     try {
@@ -102,107 +140,78 @@ exports.addReservation = async (req, res, next) => {
     }
 };
 
+exports.updateReservation = async (req, res, next) => {
+    try {
+        const reservation = await Reservation.findById(req.params.id);
 
-// exports.getReservations = async(req,res,next)=>{
-//     let query;
-//     //General users can see onlt their appointments!
-//     if(req.user.role !== 'admin'){
-//         query = Reservation.find({user:req.user.id}).populate({
-//             path:'workspace',
-//             select: 'name province tel'
-//         });
-//     }else{//If Admin can see all
-//         query= Reservation.find().populate({
-//             path:'workspace',
-//             select: 'name province tel'
-//         });;
-//     }       
-//     try{
-//         const reservations = await query;
+        if (!reservation) {
+            return res.status(404).json({
+                success: false,
+                message: 'Reservation not found'
+            });
+        }
 
-//         res.status(200).json({
-//             success:true,
-//             count:reservations.length,
-//             data: reservations
-//         });
-//     }catch(err){
-//         console.log(err);
-//         return res.status(500).json({success:false,message:"Cannot find your Reservation"});
-//     }
-// };
+        // Ensure user is either an admin or the owner of the reservation
+        if (req.user.role !== 'admin' && reservation.user.toString() !== req.user.id) {
+            return res.status(403).json({
+                success: false,
+                message: 'Unauthorized to update this reservation'
+            });
+        }
 
-// exports.getReservation = async(req,res,next)=>{
+        // Update fields that are allowed to be updated
+        reservation.appDate = req.body.appDate || reservation.appDate;
+        reservation.workspace = req.body.workspaceId || reservation.workspace; // Assuming workspace can be changed
 
-//     try{
-//         const reservation = await Reservation.findById(req.params.id);
+        // Save the updated reservation
+        const updatedReservation = await reservation.save();
 
-//         res.status(200).json({
-//             success:true,
-//             count:reservations.length,
-//             data: reservations
-//         });
-//     }catch(err){
-//         console.log(err);
-//         return res.status(500).json({success:false,message:"Cannot find your Reservation"});
-//     }
-// };
+        res.status(200).json({
+            success: true,
+            data: updatedReservation
+        });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to update the reservation'
+        });
+    }
+};
 
-// exports.addReservation=async(req,res,next)=>{
-//     try{
-//         req.body.workspace=req.params.workspaceId;
+exports.deleteReservation = async (req, res, next) => {
+    try {
+        const reservation = await Reservation.findById(req.params.id);
 
-//         const workspace=await Workspace.findById(req.params.workspaceId);
+        if (!reservation) {
+            return res.status(404).json({
+                success: false,
+                message: 'Reservation not found'
+            });
+        }
 
-//         if(!workspaceId){
-//             return res.status(404).json({success:false,message:`No workspace with the id of ${req.params.workspaceId}`});
-//         }
-        
-//         const reservation = await Reservation.create(req.body);
-//             res.status(200).json({
-//                 success:true,
-//                 data:reservation
-//             });
+        // Ensure user is either an admin or the owner of the reservation
+        if (req.user.role !== 'admin' && reservation.user.toString() !== req.user.id) {
+            return res.status(403).json({
+                success: false,
+                message: 'Unauthorized to delete this reservation'
+            });
+        }
 
-//     }catch(err){
-//         console.log(err.stack);
-//         return res.status(500).json({success:false,message:`Cannot create Reservation`});
-//     }
-// };
+        // Optionally, add additional authorization checks here to ensure the user has rights to delete the reservation
 
+        // Delete the reservation
+        await reservation.deleteOne();
 
-
-// exports.getAppointments = async(req,res,next)=>{
-//     let query;
-//     //General users can see onlt their appointments!
-//     if(req.user.role !== 'admin'){
-//         query = Appointment.find({user:req.user.id}).populate({
-//             path:'hospital',
-//             select: 'name province tel'
-//         });
-//     }else{
-//         // If you are an admin, you can see all
-//         if(req.params.hospitalId){
-//             console.log(req.params.hospitalId);
-//             query= Appointment.find({hospital: req.params.hospitalId}).populate({
-//                 path: "hospital",
-//                 select: "name province tel"
-//             });
-//         }else
-//         query=Appointment.find().populate({
-//             path:'hospital',
-//             select: 'name province tel'
-//         });
-//     }       
-//     try{
-//         const appointments= await query;
-
-//         res.status(200).json({
-//             success:true,
-//             count:appointments.length,
-//             data: appointments
-//         });
-//     }catch(err){
-//         console.log(err);
-//         return res.status(500).json({success:false,message:"Cannot find Appointment"});
-//     }
-// };
+        res.status(200).json({
+            success: true,
+            message: 'Reservation successfully deleted'
+        });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to delete the reservation'
+        });
+    }
+};
