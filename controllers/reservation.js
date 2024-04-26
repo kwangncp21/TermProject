@@ -1,9 +1,6 @@
 const Reservation = require('../models/reservation');
 const Workspace = require('../models/workSpace');
-
-//@desc     Get all appointments
-//@route    GET/api/v1/appointments
-//@access   Public
+const schedule = require('node-schedule');
 
 exports.getReservations = async(req, res, next) => {
     let query;
@@ -212,6 +209,73 @@ exports.deleteReservation = async (req, res, next) => {
         res.status(500).json({
             success: false,
             message: 'Failed to delete the reservation'
+        });
+    }
+};
+
+exports.scheduleReservationCancellations = () => {
+    schedule.scheduleJob('*/1 * * * *', async () => {  // This schedules the task to run every minute
+        console.log('Running scheduled task to check and cancel reservations.');
+        const cutoff = new Date(new Date().getTime() - 1 * 60000);  // 1 minutes ago
+        try {
+            const reservations = await Reservation.find({
+                appDate: { $lte: cutoff },
+                checkedIn: false,
+                status: 'active'  // Assuming the status field exists and 'active' is the default status
+            });
+
+            for (const reservation of reservations) {
+                console.log(`Cancelling reservation ${reservation._id} as user did not check in.`);
+                reservation.status = 'cancelled';
+                await reservation.save();
+            }
+        } catch (err) {
+            console.error('Error running the scheduled task for cancelling reservations:', err);
+        }
+    });
+}
+
+
+exports.checkInReservation = async (req, res, next) => {
+    const reservationId = req.params.id;
+
+    try {
+        const reservation = await Reservation.findById(reservationId);
+
+        if (!reservation) {
+            return res.status(404).json({
+                success: false,
+                message: 'Reservation not found.'
+            });
+        }
+
+        const currentTime = new Date();
+        const appointmentTime = new Date(reservation.appDate);
+        console.log(`Current Time: ${currentTime.toISOString()}`);
+        console.log(`Appointment Time: ${appointmentTime.toISOString()}`);
+        console.log(`Allowed Check-In Time Range: ${new Date(appointmentTime.getTime()).toISOString()} to ${new Date(appointmentTime.getTime() + 1 * 60000).toISOString()}`);
+
+        // Check if the current time is within 15 minutes after the appointment start time
+        if (currentTime >= appointmentTime && currentTime <= new Date(appointmentTime.getTime() + 1 * 60000)) {
+            reservation.checkedIn = true;
+            await reservation.save();
+
+            return res.status(200).json({
+                success: true,
+                message: 'Check-in successful.',
+                data: reservation
+            });
+        } else {
+            return res.status(400).json({
+                success: false,
+                message: 'Check-in failed. Not within the allowable time window.'
+            });
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            success: false,
+            message: 'Server error during the check-in process.'
         });
     }
 };

@@ -10,6 +10,9 @@ connectDB();
 
 const app = express();
 
+const reservationController = require('./controllers/reservation');
+reservationController.scheduleReservationCancellations();
+
 //Body parser
 app.use(express.json());
 

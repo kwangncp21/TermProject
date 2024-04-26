@@ -18,6 +18,15 @@ const ReservationSchema = new mongoose.Schema({
     createAt:{
         type: Date,
         dafault: Date.now
+    },
+    checkIn:{
+        type: Boolean,
+        dafault: false
+    },
+    status: {
+        type: String,
+        default: 'active', // Possible values: 'active', 'cancelled', 'completed'
+        required: true
     }
     
 });

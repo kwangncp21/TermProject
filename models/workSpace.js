@@ -35,10 +35,6 @@ const WorkspaceSchema = new mongoose.Schema(
       required: [true, "Please add a operation hour"],  // corrected from 'reqiured'
     }
   },
-  // {
-  //   toJSON: { virtuals: true },
-  //   toObject: { virtuals: true }
-  // }
 );
 
 module.exports = mongoose.model("workSpace", WorkspaceSchema);
