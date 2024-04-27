@@ -67,8 +67,29 @@ exports.login = async(req,res,next)=>{
     if(!isMatch){
         return res.status(401).json({success:false,msg:'Invalid credentials'});
     }
-
-    sendTokenResponse(user,200,res);
+    // res.status(200).json({
+    //     success:true,
+    //     data:user,
+    // });
+    const sendTokenResponse = (user, statusCode, res) => {
+        // Generate token (using JWT in this example)
+        const token = user.getSignedJwtToken();  // This method should be defined in your User model
+    
+        res
+            .status(statusCode)
+            .cookie('token', token)
+            .json({
+                success: true,
+                token,
+                data: {
+                    _id: user._id,
+                    name: user.name,
+                    email: user.email,
+                    role: user.role
+                }
+            });
+};
+sendTokenResponse(user,200,res);
 };
 
 exports.getMe = async(req,res,next)=>{
